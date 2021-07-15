@@ -125,8 +125,61 @@ class RedMapperHaloCentered(object):
         axes.set_xlabel('ra')
         axes.set_ylabel('dec')
         
-    def associate_cluster_to_halo(self, delta_zmax, theta_max, theta_max_type, method):
+    def associate_nearest_angle(self, delta_zmax, theta_max):
+        self.try_load_data()
         
+        return AssociationMethods.volume_match(self.__true_halo_data, 
+                                                self.__cluster_data, 
+                                                delta_zmax,
+                                                theta_max, 
+                                                "fixed_angle", 
+                                                "nearest", 
+                                                self.truth_catalog.cosmology,
+                                                self.__true_galaxy_data, 
+                                                self.__member_data)
+        
+    def associate_nearest_distance(self, delta_zmax, theta_max):
+        self.try_load_data()
+        
+        return AssociationMethods.volume_match(self.__true_halo_data, 
+                                                self.__cluster_data, 
+                                                delta_zmax,
+                                                theta_max, 
+                                                "fixed_dist", 
+                                                "nearest", 
+                                                self.truth_catalog.cosmology,
+                                                self.__true_galaxy_data, 
+                                                self.__member_data)
+        
+    def associate_nearest_scaled(self, delta_zmax, theta_max):
+        self.try_load_data()
+        
+        return AssociationMethods.volume_match(self.__true_halo_data, 
+                                                self.__cluster_data, 
+                                                delta_zmax,
+                                                theta_max, 
+                                                "scaled", 
+                                                "nearest", 
+                                                self.truth_catalog.cosmology,
+                                                self.__true_galaxy_data, 
+                                                self.__member_data)
+        
+    def associate_fixed_membership(self, delta_zmax, theta_max):
+        self.try_load_data()
+        
+        return AssociationMethods.volume_match(self.__true_halo_data, 
+                                                self.__cluster_data, 
+                                                delta_zmax,
+                                                theta_max, 
+                                                "fixed_dist", 
+                                                "membership", 
+                                                self.truth_catalog.cosmology,
+                                                self.__true_galaxy_data, 
+                                                self.__member_data)
+        
+        
+    
+    def try_load_data(self):
         if self.__cluster_data is None:
             self.get_cluster_data()
             
@@ -135,23 +188,13 @@ class RedMapperHaloCentered(object):
            
         if self.__member_data is None:
             self.get_member_data()
+
+    def print_stats(self, match_num_truth_to_det, match_num_det_to_truth, ind_bijective):
         
-        match_num_1w, match_num_2w, ind_bij = AssociationMethods.volume_match(self.__true_halo_data, 
-                                                                              self.__cluster_data, 
-                                                                              delta_zmax,
-                                                                              theta_max, 
-                                                                              theta_max_type, 
-                                                                              method, 
-                                                                              self.truth_catalog.cosmology,
-                                                                              self.__true_galaxy_data, 
-                                                                              self.__member_data)
-        
-        #print statistics
-        print ("Number of bijective associations", AssociationStatistics.number_of_associations(ind_bij))
-        print ("Number and fraction of fragmentation", AssociationStatistics.fragmentation(match_num_1w, ind_bij, method="bij"))
-        print ("Number and fraction of overmerging", AssociationStatistics.overmerging(match_num_2w, ind_bij, method="bij"))
-        print ("Completeness", AssociationStatistics.completeness(self.__true_halo_data, ind_bij, self.redmapper_catalog, self.truth_catalog))
-        print ("Purity", AssociationStatistics.purity(self.__cluster_data, ind_bij, self.redmapper_catalog, self.truth_catalog))
-        
-        PlottingHelper.plot_cluster_and_halo_position(self.__true_halo_data, self.__cluster_data, match_num_1w, match_num_2w, ind_bij)
-        #PlottingHelper.plot_redshift_comparison(self.__true_halo_data, self.__cluster_data, ind_bij)
+        print ("Number of bijective associations", AssociationStatistics.number_of_associations(ind_bijective))
+        print ("Number and fraction of fragmentation", AssociationStatistics.fragmentation(match_num_truth_to_det, ind_bijective, method="bij"))
+        print ("Number and fraction of overmerging", AssociationStatistics.overmerging(match_num_det_to_truth, ind_bijective, method="bij"))
+        print ("Completeness", AssociationStatistics.completeness(self.__true_halo_data, ind_bijective, self.redmapper_catalog, self.truth_catalog))
+        print ("Purity", AssociationStatistics.purity(self.__cluster_data, ind_bijective, self.redmapper_catalog, self.truth_catalog))
+
+        PlottingHelper.plot_cluster_and_halo_position(self.__true_halo_data, self.__cluster_data, match_num_truth_to_det, match_num_det_to_truth, ind_bijective)
