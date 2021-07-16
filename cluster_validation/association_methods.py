@@ -67,10 +67,10 @@ def volume_associations(truth_data, cluster_data, theta_max, delta_zmax, associa
     
     """Perform volume association based on theta_max and delta_zmax and return number and list of associations"""
     
-    if coo_DC2 == None:
+    if coo_DC2 is None:
         coo_DC2 = SkyCoord(truth_data['ra']*u.deg,truth_data['dec']*u.deg)
         
-    if coo_RM == None:
+    if coo_RM is None:
         coo_RM  = SkyCoord(cluster_data['ra']*u.deg, cluster_data['dec']*u.deg)
         
     
