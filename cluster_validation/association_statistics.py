@@ -100,8 +100,8 @@ def completeness_2d(halo_data, ind_bij, gc, gc_truth, bin_range = None, bins = N
     number_of_halo = hist_num_halo[0]
     
     area_ratio = np.min([gc_truth.sky_area, gc.sky_area])/gc_truth.sky_area
-    
-    compl_2d = 1/ area_ratio * number_of_match/number_of_halo
+    completeness = completeness = np.divide(number_of_match, number_of_halo, out=np.zeros_like(number_of_match), where = number_of_halo != 0)
+    compl_2d = 1/ area_ratio * completeness
     
     compl_2d_masked = np.ma.masked_where(number_of_halo<nmin, compl_2d)
     
@@ -117,8 +117,9 @@ def purity_2d(cluster_data, ind_bij, gc, gc_truth, bin_range = None, bins = None
     number_of_detection = hist_num_halo[0]
     
     area_ratio = np.min([gc_truth.sky_area, gc.sky_area])/gc.sky_area
+    purity = np.divide(number_of_match, number_of_detection, out=np.zeros_like(number_of_match), where = number_of_detection != 0)
     
-    pure_2d = 1/ area_ratio * number_of_match/number_of_detection
+    pure_2d = 1/ area_ratio * purity
     
     pure_2d_masked = np.ma.masked_where(number_of_detection<nmin, pure_2d)
     
